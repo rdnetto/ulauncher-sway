@@ -22,7 +22,11 @@ class SwayWindowsExtension(Extension):
 
 class KeywordQueryEventListener(EventListener):
     def on_event(self, event, extension):
-        items = list([self.get_result_item(w) for w in windows.get_windows()])
+        items = list([self.get_result_item(w)
+                      for w in windows.get_windows()
+                      # Don't include the ulauncher dialog in the list,
+                      # since it already has focus
+                      if not w["focused"]])
         return RenderResultListAction(items)
 
 

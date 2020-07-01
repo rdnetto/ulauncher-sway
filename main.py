@@ -26,13 +26,28 @@ class KeywordQueryEventListener(EventListener):
     '''Generates items for display on query'''
 
     def on_event(self, event, extension):
+        # list of lowercase words in query
+        query = event.get_query().get_argument("").lower().split()
+
         items = list([self.get_result_item(w)
                       for w in windows.get_windows()
                       # Don't include the ulauncher dialog in the list,
                       # since it already has focus
-                      if not w["focused"]])
+                      if self.matches_query(w, query) and not w["focused"]])
+
         return RenderResultListAction(items)
 
+    def matches_query(self, con, query):
+        '''Enable word-wise fuzzy searching'''
+
+        (_, appName, winTitle) = windows.app_details(con)
+        s = (appName + " " + winTitle).lower()
+
+        for word in query:
+            if word not in s:
+                return False
+
+        return True
 
     def get_result_item(self, con):
         (_, appName, winTitle) = windows.app_details(con)

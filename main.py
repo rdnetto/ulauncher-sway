@@ -5,6 +5,7 @@ from ulauncher.api.shared.event import KeywordQueryEvent, ItemEnterEvent
 from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
 from ulauncher.api.shared.action.RenderResultListAction import RenderResultListAction
 from ulauncher.api.shared.action.RunScriptAction import RunScriptAction
+from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAction
 import subprocess
 import sway.windows as windows
 from sway.icons import get_icon
@@ -18,9 +19,12 @@ class SwayWindowsExtension(Extension):
     def __init__(self):
         super(SwayWindowsExtension, self).__init__()
         self.subscribe(KeywordQueryEvent, KeywordQueryEventListener())
+        self.subscribe(ItemEnterEvent, ItemEnterEventListener())
 
 
 class KeywordQueryEventListener(EventListener):
+    '''Generates items for display on query'''
+
     def on_event(self, event, extension):
         items = list([self.get_result_item(w)
                       for w in windows.get_windows()
@@ -33,19 +37,20 @@ class KeywordQueryEventListener(EventListener):
     def get_result_item(self, con):
         (_, appName, winTitle) = windows.app_details(con)
 
-        cmd = windows.focus_cmd(con)
-
         return ExtensionResultItem(
                 icon=get_icon(con),
                 name=winTitle,
                 description=appName,
-                on_enter=self.swaymsg_action(cmd))
+                # This only works because con is a dict, and therefore pickleable
+                on_enter=ExtensionCustomAction(con))
 
-    def swaymsg_action(self, args):
-        ''' We can only use predefined actions, so have to specify the
-            behaviour using a shell script
-        '''
-        return RunScriptAction("#!/bin/sh -e\nswaymsg " + " ".join(["'" + a + "'" for a in args]))
+
+class ItemEnterEventListener(EventListener):
+    '''Executes the focus event, using the data provided in ExtensionCustomAction'''
+
+    def on_event(self, event, extension):
+        con = event.get_data()
+        windows.focus(con)
 
 
 if __name__ == '__main__':

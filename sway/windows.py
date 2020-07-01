@@ -3,7 +3,7 @@ import subprocess
 from sway.util import get_child_or_else
 
 
-def focus_cmd(con):
+def focus(con):
     '''Returns the list of args to pass to swaymsg'''
 
     # Container objects have 3 different ID fields:
@@ -13,7 +13,7 @@ def focus_cmd(con):
     con_id = con["id"]
 
     # invokes: '<criteria> focus' (documented in sway(5))
-    return [f"[con_id=\"{con_id}\"]", "focus"]
+    subprocess.check_output(["swaymsg", f"[con_id=\"{con_id}\"]", "focus"])
 
 
 def get_tree_object():

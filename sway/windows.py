@@ -1,5 +1,6 @@
 import json
 import subprocess
+from sway.util import get_child_or_else
 
 
 def focus_cmd(con):
@@ -60,10 +61,6 @@ def app_details(con):
 
     # (con_id, application name, window title)
     return (con["id"], app_name, con["name"])
-
-
-def get_child_or_else(dict, key, default):
-    return dict[key] if key in dict else default
 
 
 if __name__ == "__main__":

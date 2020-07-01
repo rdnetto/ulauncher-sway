@@ -1,0 +1,19 @@
+{
+    "required_api_version": "^2.0.0",
+    "name": "Sway Windows",
+    "description": "Activates a window in Sway",
+    "developer_name": "Renee D'Netto",
+    "icon": "images/icon.png",
+    "options": {
+        "query_debounce": 0.05
+    },
+    "preferences": [
+        {
+            "id": "kw",
+            "type": "keyword",
+            "name": "Sway Windows",
+            "description": "Activates a window in Sway",
+            "default_value": "w"
+        }
+    ]
+}
